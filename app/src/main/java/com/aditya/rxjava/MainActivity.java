@@ -12,12 +12,14 @@ import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private static final String TAG = "MainActivity";
+    private CompositeDisposable disposable = new CompositeDisposable();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         taskObservable.subscribe(new Observer<Task>() {
             @Override
             public void onSubscribe(@NonNull Disposable d) {
+                disposable.add(d);
                 Log.d(TAG, "onSubscribe: called");
             }
 
@@ -59,5 +62,11 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "onComplete: called");
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        disposable.clear();
+        super.onDestroy();
     }
 }
